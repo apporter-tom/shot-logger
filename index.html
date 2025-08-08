@@ -236,85 +236,112 @@
   </table>
 
   <script>
-    let shotCount = 0;
+  let shotCount = 0;
 
-    function selectValue(field, button) {
-      document.getElementById(field).value = button.innerText;
-      const buttons = document.querySelectorAll(`#${field}Btns button`);
-      buttons.forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
+  function selectValue(field, button) {
+    document.getElementById(field).value = button.innerText;
+    const buttons = document.querySelectorAll(`#${field}Btns button`);
+    buttons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+  }
+
+  function logShot() {
+    const course = document.getElementById("course").value;
+    const date = document.getElementById("date").value;
+    const hole = document.getElementById("hole").value;
+    const club = document.getElementById("club").value;
+    const lie = document.getElementById("lie").value;
+    const position = document.getElementById("position").value;
+    const targetDistance = document.getElementById("targetDistance").value;
+    const realDistance = document.getElementById("realDistance").value;
+    const plannedShape = document.getElementById("plannedShape").value;
+    const realShape = document.getElementById("realShape").value;
+    const line = document.getElementById("line").value;
+    const flight = document.getElementById("flight").value;
+    const strike = document.getElementById("strike").value;
+    const note = document.getElementById("note").value;
+
+    const table = document.getElementById("logBody");
+    const row = table.insertRow();
+
+    shotCount++;
+    row.innerHTML = `
+      <td>${shotCount}</td>
+      <td>${course}</td>
+      <td>${date}</td>
+      <td>${hole}</td>
+      <td>${club}</td>
+      <td>${lie}</td>
+      <td>${position}</td>
+      <td>${targetDistance}</td>
+      <td>${realDistance}</td>
+      <td>${plannedShape}</td>
+      <td>${realShape}</td>
+      <td>${line}</td>
+      <td>${flight}</td>
+      <td>${strike}</td>
+      <td>${note}</td>
+    `;
+
+    saveToLocalStorage();
+
+    document.getElementById("targetDistance").value = "";
+    document.getElementById("realDistance").value = "";
+    document.getElementById("note").value = "";
+  }
+
+  function deleteLastShot() {
+    const table = document.getElementById("logBody");
+    if (table.rows.length > 0) {
+      table.deleteRow(-1);
+      shotCount--;
+      saveToLocalStorage();
     }
+  }
 
-    function logShot() {
-      const course = document.getElementById("course").value;
-      const date = document.getElementById("date").value;
-      const hole = document.getElementById("hole").value;
-      const club = document.getElementById("club").value;
-      const lie = document.getElementById("lie").value;
-      const position = document.getElementById("position").value;
-      const targetDistance = document.getElementById("targetDistance").value;
-      const realDistance = document.getElementById("realDistance").value;
-      const plannedShape = document.getElementById("plannedShape").value;
-      const realShape = document.getElementById("realShape").value;
-      const line = document.getElementById("line").value;
-      const flight = document.getElementById("flight").value;
-      const strike = document.getElementById("strike").value;
-      const note = document.getElementById("note").value;
+  function exportToCSV() {
+    const table = document.getElementById("log");
+    const rows = table.querySelectorAll("tr");
+    let csvContent = "";
 
+    rows.forEach(row => {
+      const cols = Array.from(row.querySelectorAll("th, td")).map(col => col.innerText);
+      csvContent += cols.join(",") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "golf_shots_log.csv";
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function saveToLocalStorage() {
+    const table = document.getElementById("logBody");
+    const data = Array.from(table.rows).map(row => Array.from(row.cells).map(cell => cell.innerText));
+    localStorage.setItem("golfShotLog", JSON.stringify(data));
+    localStorage.setItem("shotCount", shotCount);
+  }
+
+  function loadFromLocalStorage() {
+    const savedData = JSON.parse(localStorage.getItem("golfShotLog"));
+    const savedCount = parseInt(localStorage.getItem("shotCount")) || 0;
+    if (savedData && savedData.length) {
       const table = document.getElementById("logBody");
-      const row = table.insertRow();
-
-      shotCount++;
-      row.innerHTML = `
-        <td>${shotCount}</td>
-        <td>${course}</td>
-        <td>${date}</td>
-        <td>${hole}</td>
-        <td>${club}</td>
-        <td>${lie}</td>
-        <td>${position}</td>
-        <td>${targetDistance}</td>
-        <td>${realDistance}</td>
-        <td>${plannedShape}</td>
-        <td>${realShape}</td>
-        <td>${line}</td>
-        <td>${flight}</td>
-        <td>${strike}</td>
-        <td>${note}</td>
-      `;
-
-      document.getElementById("targetDistance").value = "";
-      document.getElementById("realDistance").value = "";
-      document.getElementById("note").value = "";
-    }
-
-    function deleteLastShot() {
-      const table = document.getElementById("logBody");
-      if (table.rows.length > 0) {
-        table.deleteRow(-1);
-        shotCount--;
-      }
-    }
-
-    function exportToCSV() {
-      const table = document.getElementById("log");
-      const rows = table.querySelectorAll("tr");
-      let csvContent = "";
-
-      rows.forEach(row => {
-        const cols = Array.from(row.querySelectorAll("th, td")).map(col => col.innerText);
-        csvContent += cols.join(",") + "\n";
+      savedData.forEach(rowData => {
+        const row = table.insertRow();
+        row.innerHTML = rowData.map(cell => `<td>${cell}</td>`).join("");
       });
-
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "golf_shots_log.csv";
-      link.style.display = "none";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      shotCount = savedCount;
     }
-  </script>
+  }
+
+  // Load on startup
+  window.onload = loadFromLocalStorage;
+</script>
+
 </body>
 </html>
