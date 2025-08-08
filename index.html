@@ -36,7 +36,28 @@
       color: #f0f0f0;
     }
 
-    button {
+    .button-group {
+      display: flex;
+      gap: 0.5em;
+      margin-top: 0.3em;
+      flex-wrap: wrap;
+    }
+
+    .button-group button {
+      flex: 1 1 auto;
+      padding: 0.5em;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .button-group button.active {
+      background: #2196f3;
+    }
+
+    button.action {
       margin-top: 1.5em;
       padding: 0.75em 1.5em;
       font-weight: bold;
@@ -47,7 +68,7 @@
       cursor: pointer;
     }
 
-    button:hover {
+    button.action:hover {
       background-color: #1976d2;
     }
 
@@ -84,7 +105,6 @@
 <body>
   <h1>Golf Shot Logger</h1>
 
-  <!-- Form Fields -->
   <label for="course">Course</label>
   <input type="text" id="course" />
 
@@ -94,94 +114,103 @@
   <label for="hole">Hole</label>
   <input type="number" id="hole" value="1" />
 
-  <label for="club">Club</label>
-  <select id="club">
-    <option>D</option>
-    <option>3W</option>
-    <option>4i</option>
-    <option>5i</option>
-    <option>6i</option>
-    <option>7i</option>
-    <option>8i</option>
-    <option>9i</option>
-    <option>PW</option>
-    <option>50</option>
-    <option>56</option>
-  </select>
+  <!-- Button Fields -->
+  <label>Club</label>
+  <div id="clubBtns" class="button-group">
+    <button type="button" onclick="selectValue('club', this)">D</button>
+    <button type="button" onclick="selectValue('club', this)">3W</button>
+    <button type="button" onclick="selectValue('club', this)">4i</button>
+    <button type="button" onclick="selectValue('club', this)">5i</button>
+    <button type="button" onclick="selectValue('club', this)">6i</button>
+    <button type="button" onclick="selectValue('club', this)">7i</button>
+    <button type="button" onclick="selectValue('club', this)">8i</button>
+    <button type="button" onclick="selectValue('club', this)">9i</button>
+    <button type="button" onclick="selectValue('club', this)">PW</button>
+    <button type="button" onclick="selectValue('club', this)">50</button>
+    <button type="button" onclick="selectValue('club', this)">56</button>
+  </div>
+  <input type="hidden" id="club" value="" />
 
-  <label for="lie">Lie</label>
-  <select id="lie">
-    <option>Tee</option>
-    <option>Fairway</option>
-    <option>Rough (good)</option>
-    <option>Rough (bad)</option>
-    <option>Bunker</option>
-  </select>
+  <label>Lie</label>
+  <div id="lieBtns" class="button-group">
+    <button type="button" onclick="selectValue('lie', this)">Tee</button>
+    <button type="button" onclick="selectValue('lie', this)">Fairway</button>
+    <button type="button" onclick="selectValue('lie', this)">Rough (good)</button>
+    <button type="button" onclick="selectValue('lie', this)">Rough (bad)</button>
+    <button type="button" onclick="selectValue('lie', this)">Bunker</button>
+  </div>
+  <input type="hidden" id="lie" value="" />
 
-  <label for="position">Position</label>
-  <select id="position">
-    <option>Even</option>
-    <option>Above</option>
-    <option>Below</option>
-    <option>Uphill</option>
-    <option>Downhill</option>
-  </select>
+  <label>Position</label>
+  <div id="positionBtns" class="button-group">
+    <button type="button" onclick="selectValue('position', this)">Even</button>
+    <button type="button" onclick="selectValue('position', this)">Above</button>
+    <button type="button" onclick="selectValue('position', this)">Below</button>
+    <button type="button" onclick="selectValue('position', this)">Uphill</button>
+    <button type="button" onclick="selectValue('position', this)">Downhill</button>
+  </div>
+  <input type="hidden" id="position" value="" />
 
   <label for="targetDistance">Target Distance</label>
-  <input type="number" id="targetDistance" />
+  <input type="text" id="targetDistance" />
 
   <label for="realDistance">Real Distance</label>
-  <input type="number" id="realDistance" />
+  <input type="text" id="realDistance" />
 
-  <label for="plannedShape">Planned Shape</label>
-  <select id="plannedShape">
-    <option>Straight</option>
-    <option>Draw</option>
-    <option>Cut</option>
-  </select>
+  <label>Planned Shape</label>
+  <div id="plannedShapeBtns" class="button-group">
+    <button type="button" onclick="selectValue('plannedShape', this)">Straight</button>
+    <button type="button" onclick="selectValue('plannedShape', this)">Draw</button>
+    <button type="button" onclick="selectValue('plannedShape', this)">Cut</button>
+  </div>
+  <input type="hidden" id="plannedShape" value="" />
 
-  <label for="realShape">Real Shape</label>
-  <select id="realShape">
-    <option>Straight</option>
-    <option>Draw</option>
-    <option>Cut</option>
-    <option>Hook</option>
-    <option>Slice</option>
-    <option>Shank</option>
-  </select>
+  <label>Real Shape</label>
+  <div id="realShapeBtns" class="button-group">
+    <button type="button" onclick="selectValue('realShape', this)">Straight</button>
+    <button type="button" onclick="selectValue('realShape', this)">Draw</button>
+    <button type="button" onclick="selectValue('realShape', this)">Cut</button>
+    <button type="button" onclick="selectValue('realShape', this)">Hook</button>
+    <button type="button" onclick="selectValue('realShape', this)">Slice</button>
+    <button type="button" onclick="selectValue('realShape', this)">Shank</button>
+  </div>
+  <input type="hidden" id="realShape" value="" />
 
-  <label for="startDir">Line</label>
-  <select id="startDir">
-    <option>Left</option>
-    <option>Centre</option>
-    <option>Right</option>
-  </select>
+  <label>Line</label>
+  <div id="lineBtns" class="button-group">
+    <button type="button" onclick="selectValue('line', this)">Left</button>
+    <button type="button" onclick="selectValue('line', this)">Centre</button>
+    <button type="button" onclick="selectValue('line', this)">Right</button>
+  </div>
+  <input type="hidden" id="line" value="" />
 
-  <label for="flight">Flight</label>
-  <select id="flight">
-    <option>High</option>
-    <option>Mid</option>
-    <option>Low</option>
-  </select>
+  <label>Flight</label>
+  <div id="flightBtns" class="button-group">
+    <button type="button" onclick="selectValue('flight', this)">High</button>
+    <button type="button" onclick="selectValue('flight', this)">Mid</button>
+    <button type="button" onclick="selectValue('flight', this)">Low</button>
+  </div>
+  <input type="hidden" id="flight" value="" />
 
-  <label for="strike">Strike</label>
-  <select id="strike">
-    <option>Centre</option>
-    <option>Toe</option>
-    <option>Heel</option>
-    <option>Thin</option>
-    <option>Fat</option>
-    <option>Top</option>
-    <option>Chunk</option>
-    <option>Shank</option>
-  </select>
+  <label>Strike</label>
+  <div id="strikeBtns" class="button-group">
+    <button type="button" onclick="selectValue('strike', this)">Centre</button>
+    <button type="button" onclick="selectValue('strike', this)">Toe</button>
+    <button type="button" onclick="selectValue('strike', this)">Heel</button>
+    <button type="button" onclick="selectValue('strike', this)">Thin</button>
+    <button type="button" onclick="selectValue('strike', this)">Fat</button>
+    <button type="button" onclick="selectValue('strike', this)">Top</button>
+    <button type="button" onclick="selectValue('strike', this)">Chunk</button>
+    <button type="button" onclick="selectValue('strike', this)">Shank</button>
+  </div>
+  <input type="hidden" id="strike" value="" />
 
-  <label for="note">Miss/Note</label>
+  <label for="note">Note</label>
   <input type="text" id="note" />
 
-  <button onclick="logShot()">Log Shot</button>
-  <button onclick="deleteLastShot()">Delete Last Shot</button>
-  <button onclick="exportToCSV()">Export to CSV</button>
+  <button class="action" onclick="logShot()">Log Shot</button>
+  <button class="action" onclick="exportToCSV()">Export CSV</button>
+  <button class="action" onclick="deleteLastShot()">Delete Last Shot</button>
 
   <table id="log">
     <thead>
@@ -209,6 +238,13 @@
   <script>
     let shotCount = 0;
 
+    function selectValue(field, button) {
+      document.getElementById(field).value = button.innerText;
+      const buttons = document.querySelectorAll(`#${field}Btns button`);
+      buttons.forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+    }
+
     function logShot() {
       const course = document.getElementById("course").value;
       const date = document.getElementById("date").value;
@@ -220,7 +256,7 @@
       const realDistance = document.getElementById("realDistance").value;
       const plannedShape = document.getElementById("plannedShape").value;
       const realShape = document.getElementById("realShape").value;
-      const startDir = document.getElementById("startDir").value;
+      const line = document.getElementById("line").value;
       const flight = document.getElementById("flight").value;
       const strike = document.getElementById("strike").value;
       const note = document.getElementById("note").value;
@@ -241,7 +277,7 @@
         <td>${realDistance}</td>
         <td>${plannedShape}</td>
         <td>${realShape}</td>
-        <td>${startDir}</td>
+        <td>${line}</td>
         <td>${flight}</td>
         <td>${strike}</td>
         <td>${note}</td>
@@ -261,18 +297,20 @@
     }
 
     function exportToCSV() {
-      const rows = document.querySelectorAll("table tr");
-      let csvContent = "data:text/csv;charset=utf-8,";
+      const table = document.getElementById("log");
+      const rows = table.querySelectorAll("tr");
+      let csvContent = "";
 
       rows.forEach(row => {
-        const cols = Array.from(row.querySelectorAll("td, th")).map(col => col.innerText);
+        const cols = Array.from(row.querySelectorAll("th, td")).map(col => col.innerText);
         csvContent += cols.join(",") + "\n";
       });
 
-      const encodedUri = encodeURI(csvContent);
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "golf_shots_log.csv");
+      link.href = URL.createObjectURL(blob);
+      link.download = "golf_shots_log.csv";
+      link.style.display = "none";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
