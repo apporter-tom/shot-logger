@@ -113,6 +113,8 @@
 
   <button onclick="logShot()">Log Shot</button>
   <button onclick="exportToCSV()">Export to CSV</button>
+  <button onclick="deleteLastShot()">Delete Last Shot</button>
+
 
   <table id="log">
     <thead>
@@ -203,8 +205,13 @@
     link.click();
     document.body.removeChild(link);
   }
-
+  function deleteLastShot() {
+  const table = document.getElementById("logBody");
+  if (table.rows.length > 0) {
+    table.deleteRow(-1);
+    shotCount--;
   </script>
 </body>
 </html>
+
 
