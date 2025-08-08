@@ -236,112 +236,99 @@
   </table>
 
   <script>
-  let shotCount = 0;
+  const log = JSON.parse(localStorage.getItem("golfLog")) || [];
 
-  function selectValue(field, button) {
-    document.getElementById(field).value = button.innerText;
-    const buttons = document.querySelectorAll(`#${field}Btns button`);
-    buttons.forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+  function selectValue(field, btn) {
+    document.querySelectorAll(`#${field}Btns button`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(field).value = btn.textContent;
   }
 
   function logShot() {
-    const course = document.getElementById("course").value;
-    const date = document.getElementById("date").value;
-    const hole = document.getElementById("hole").value;
-    const club = document.getElementById("club").value;
-    const lie = document.getElementById("lie").value;
-    const position = document.getElementById("position").value;
-    const targetDistance = document.getElementById("targetDistance").value;
-    const realDistance = document.getElementById("realDistance").value;
-    const plannedShape = document.getElementById("plannedShape").value;
-    const realShape = document.getElementById("realShape").value;
-    const line = document.getElementById("line").value;
-    const flight = document.getElementById("flight").value;
-    const strike = document.getElementById("strike").value;
-    const note = document.getElementById("note").value;
-
-    const table = document.getElementById("logBody");
-    const row = table.insertRow();
-
-    shotCount++;
-    row.innerHTML = `
-      <td>${shotCount}</td>
-      <td>${course}</td>
-      <td>${date}</td>
-      <td>${hole}</td>
-      <td>${club}</td>
-      <td>${lie}</td>
-      <td>${position}</td>
-      <td>${targetDistance}</td>
-      <td>${realDistance}</td>
-      <td>${plannedShape}</td>
-      <td>${realShape}</td>
-      <td>${line}</td>
-      <td>${flight}</td>
-      <td>${strike}</td>
-      <td>${note}</td>
-    `;
-
-    saveToLocalStorage();
-
-    document.getElementById("targetDistance").value = "";
-    document.getElementById("realDistance").value = "";
-    document.getElementById("note").value = "";
+    const shot = {
+      course: document.getElementById("course").value,
+      date: document.getElementById("date").value,
+      hole: document.getElementById("hole").value,
+      club: document.getElementById("club").value,
+      lie: document.getElementById("lie").value,
+      position: document.getElementById("position").value,
+      targetDistance: document.getElementById("targetDistance").value,
+      realDistance: document.getElementById("realDistance").value,
+      plannedShape: document.getElementById("plannedShape").value,
+      realShape: document.getElementById("realShape").value,
+      line: document.getElementById("line").value,
+      flight: document.getElementById("flight").value,
+      strike: document.getElementById("strike").value,
+      note: document.getElementById("note").value
+    };
+    log.push(shot);
+    localStorage.setItem("golfLog", JSON.stringify(log));
+    updateTable();
   }
 
-  function deleteLastShot() {
-    const table = document.getElementById("logBody");
-    if (table.rows.length > 0) {
-      table.deleteRow(-1);
-      shotCount--;
-      saveToLocalStorage();
-    }
+  function updateTable() {
+    const tbody = document.getElementById("logBody");
+    tbody.innerHTML = "";
+    log.forEach((shot, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${shot.course}</td>
+        <td>${shot.date}</td>
+        <td>${shot.hole}</td>
+        <td>${shot.club}</td>
+        <td>${shot.lie}</td>
+        <td>${shot.position}</td>
+        <td>${shot.targetDistance}</td>
+        <td>${shot.realDistance}</td>
+        <td>${shot.plannedShape}</td>
+        <td>${shot.realShape}</td>
+        <td>${shot.line}</td>
+        <td>${shot.flight}</td>
+        <td>${shot.strike}</td>
+        <td>${shot.note}</td>
+      `;
+      tbody.appendChild(row);
+    });
   }
 
   function exportToCSV() {
-    const table = document.getElementById("log");
-    const rows = table.querySelectorAll("tr");
-    let csvContent = "";
+    if (!log.length) return;
 
-    rows.forEach(row => {
-      const cols = Array.from(row.querySelectorAll("th, td")).map(col => col.innerText);
-      csvContent += cols.join(",") + "\n";
-    });
+    const headers = Object.keys(log[0]);
+    const csvRows = [
+      headers.join(","),
+      ...log.map(shot => headers.map(h => `"${(shot[h] || "").replace(/"/g, '""')}"`).join(","))
+    ];
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "golf_shots_log.csv";
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
 
-  function saveToLocalStorage() {
-    const table = document.getElementById("logBody");
-    const data = Array.from(table.rows).map(row => Array.from(row.cells).map(cell => cell.innerText));
-    localStorage.setItem("golfShotLog", JSON.stringify(data));
-    localStorage.setItem("shotCount", shotCount);
-  }
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "golf_log.csv";
+    a.click();
+    URL.revokeObjectURL(url);
 
-  function loadFromLocalStorage() {
-    const savedData = JSON.parse(localStorage.getItem("golfShotLog"));
-    const savedCount = parseInt(localStorage.getItem("shotCount")) || 0;
-    if (savedData && savedData.length) {
-      const table = document.getElementById("logBody");
-      savedData.forEach(rowData => {
-        const row = table.insertRow();
-        row.innerHTML = rowData.map(cell => `<td>${cell}</td>`).join("");
-      });
-      shotCount = savedCount;
+    if (confirm("Clear the log after exporting?")) {
+      log.length = 0;
+      localStorage.removeItem("golfLog");
+      updateTable();
     }
   }
 
-  // Load on startup
-  window.onload = loadFromLocalStorage;
+  function deleteLastShot() {
+    if (log.length > 0) {
+      log.pop();
+      localStorage.setItem("golfLog", JSON.stringify(log));
+      updateTable();
+    }
+  }
+
+  // Load saved data on page load
+  updateTable();
 </script>
+
 
 </body>
 </html>
